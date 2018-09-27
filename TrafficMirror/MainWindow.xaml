@@ -1,0 +1,210 @@
+﻿<!--
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
+/*                                                                                                                  */
+/*    (c) Cooperative Media Lab, Bamberg, Germany                                                                   */
+/*                                                                                                                  */
+/*     This file is part of the Master Thesis "TrafficMirror: An Ambient Zoomable Display for Traffic Information." */
+/*                                                                                                                  */
+/*     Chair for Human-Computer Interaction                                                                         */
+/*                                                                                                                  */
+/*     Friedemann Dürrbeck                                                                                          */
+/*     1766526                                                                                                      */
+/*     friedemann-thomas.duerrbeck@stud.uni-bamberg.de                                                              */
+/*                                                                                                                  */
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/   
+-->   
+    <Window x:Class="TrafficMirror.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TrafficMirror"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        mc:Ignorable="d"
+        Title="TrafficMirror" Height="Auto" Width="Auto"
+        KeyDown="Window_KeyDown"
+        KeyUp="Window_KeyUp"
+        WindowStartupLocation="CenterScreen" WindowState="Maximized">
+
+    <!-- DisposeListener-Methode der SensorDataWPF-Klasse wird aufgerufen wenn die Applikation beendet wird -->
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <ei:CallMethodAction TargetObject="{Binding sensorData}" MethodName="DisposeListener"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="10,3"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+    </Window.Resources>
+        
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+      
+            <StackPanel Name="RequestURL" Grid.RowSpan="2" Margin="0,5">
+                <TextBlock Text="Serial Port:" FontWeight="Bold" HorizontalAlignment="Left" FontSize="14"/>
+                <ComboBox Name="numCom" Margin="5,0"/>
+                <Button Name="conBtn" Content="Connect Serial Port" Click="ConnectButton_Click"/>
+                <Button Name="disBtn" Content="Disconnect Serial Port" Click="DisBtn_Click"/>
+                <TextBlock Name="SPStatus" Text="SP Not Connected!" FontWeight="Bold" HorizontalAlignment="Center" FontSize="14" Foreground="Red"/>
+                <GridSplitter HorizontalAlignment="Stretch" Height="1" Margin="0,5"/>
+                <CheckBox Name="CbManualMode" Content="Drive Car with Keyboard" Checked="CbManualMode_Checked" Unchecked="CbManualMode_Unchecked"/>
+                <GridSplitter HorizontalAlignment="Stretch" Height="1" Margin="0,5"/>
+                <!-- <Button Content="Only Traffic (Map Area)" Click="TrafficBtn_Clicked"/> -->
+                <TextBlock Name="TbDirections" Text="Directions" FontWeight="Bold" HorizontalAlignment="Center" FontSize="14"/>
+                <TextBox Name="inp_FROM">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                            <Style.Resources>
+                                <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                                    <VisualBrush.Visual>
+                                        <Label Content="FROM" Foreground="SlateGray" />
+                                    </VisualBrush.Visual>
+                                </VisualBrush>
+                            </Style.Resources>
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                                    <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                                </Trigger>
+                                <Trigger Property="Text" Value="{x:Null}">
+                                    <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter Property="Background" Value="White" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+                <TextBox Name="inp_TO">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                            <Style.Resources>
+                                <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                                    <VisualBrush.Visual>
+                                        <Label Content="TO" Foreground="SlateGray" />
+                                    </VisualBrush.Visual>
+                                </VisualBrush>
+                            </Style.Resources>
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                                    <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                                </Trigger>
+                                <Trigger Property="Text" Value="{x:Null}">
+                                    <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter Property="Background" Value="White" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+                <Button Name="btnGo" Content="Go for Warnings" Click="RouteBtn_Clicked"/>
+                <GridSplitter HorizontalAlignment="Stretch" Height="1" Margin="0,5"/>
+                <TextBlock Name="KeyDown_Events" Text="Serial Port Commands" FontWeight="Bold" HorizontalAlignment="Center" FontSize="14"/>
+                <Image Name="ImgKeyEvents" Width="75" Height="75" Margin="0,5"/>
+                <TextBlock Name="tbSpeed" Text="Speed" FontWeight="Bold" HorizontalAlignment="Center" FontSize="14"/>
+                <TextBlock Name="CarSpeed" Margin="0,5" HorizontalAlignment="Center" FontSize="16" Background="#FF00E415"/>
+                <Label  Foreground="Blue" >PalmPositionX</Label>
+                <TextBox Width="100" Height="23" Text="{Binding sensorData.PalmPositionX}"/>
+                <Label Foreground="Blue">Scaling-Factor</Label>
+                <TextBox Width="100" Height="23" Text="{Binding sensorData.Scale}"/>
+                <Image Width="{Binding sensorData.ImgWidth}" Height="{Binding sensorData.ImgHeight}" Source="{Binding sensorData.ImgPath}" Margin="0,5" />
+                <Button Content="Zoom by Mouse Wheel Abuse" Click="Button_Click"  Visibility="Hidden"/>
+            </StackPanel>
+
+        <StackPanel Name="RequestPanel"  Grid.RowSpan="2" Grid.Column="1">
+            <Grid Margin="5,10,5,5">
+                <TextBlock Text="Request URL:"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Width="170">
+                    <TextBlock Text="Processing Time: "/>
+                    <TextBlock Name="ProcessingTimeTbx"/>
+                </StackPanel>
+            </Grid>
+            <TextBox Name="RequestUrlTbx" Height="25" Margin="10,0"/>
+        </StackPanel>
+
+        <StackPanel Name="BingMapsPanel" Grid.RowSpan="2" Grid.Column="1" Visibility="Collapsed">
+            <Grid Margin="5,10,5,5">
+                <TextBlock Text="BingMaps URL:"/>
+            </Grid>
+            <TextBox Name="BingMapsURLTbx" Height="25" Margin="10,0"/>
+        </StackPanel>
+
+        <TabControl Grid.Row="1" Grid.Column="1" SelectionChanged="TabControl_SelectionChanged">
+            <TabItem Name="CongestionTab" Header="Traffic Congestions" Height="22" VerticalAlignment="Top">
+                <StackPanel Name="SeverityRatings_panel" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <!-- <ListBox Name="CongestionsListBox" HorizontalAlignment="Center" VerticalAlignment="Center"> -->
+                
+                <!--</ListBox> -->
+            </TabItem>
+            <TabItem Name="BingMapsTab" Header="Bing Maps" Height="22" VerticalAlignment="Top">
+                <StackPanel Name="SPBingTab" Orientation="Horizontal">
+                    <WebBrowser Name="BingMapsWebPage" Width="{Binding ActualWidth, ElementName=SPBingTab}" Height="{Binding ActualHeight, ElementName=SPBingTab}"  />
+                    <!--<bing:Map Name="bingMap" CredentialsProvider="AgEuKOooTPY5uRpqQFbRuGj__X4Ilkx48ORgq5N512vWTLn5CVvYZu6YoKbxYrOO" Center="40.13618,-0.45822" Height="{Binding ActualHeight, ElementName=SPBingTab}" Width="{Binding ActualWidth, ElementName=SPBingTab}" AnimationLevel="UserInput" ZoomLevel="{Binding sensorData.Scale, Mode=TwoWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}"/> -->
+                    
+                </StackPanel>
+                    
+            </TabItem>
+            <TabItem Name="ResponseTab" Header="Response- Trimmed">
+                <TreeView Name="ResultTreeView" BorderThickness="0">
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type local:ObjectNode}" ItemsSource="{Binding Path=Children}">
+                            <TreeViewItem>
+                                <TreeViewItem.Header>
+                                    <StackPanel Orientation="Horizontal" Margin="-10,0,0,0">
+                                        <TextBlock Text="{Binding Path=Name}"/>
+                                        <TextBlock Text=" : "/>
+                                        <TextBlock Text="{Binding Path=Value}"/>
+
+                                        <!--  <TextBox Text="{Binding Path=Name, Mode=OneWay}"/>
+                                        <TextBox Text=" : "/>
+                                        <TextBox Text="{Binding Path=Value, Mode=OneWay}"/>-->
+                                    </StackPanel>
+                                </TreeViewItem.Header>
+                            </TreeViewItem>
+                        </HierarchicalDataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
+            </TabItem>
+            <TabItem Name="ResponseFullTab" Header="Response - Complete" Visibility="Hidden">
+                <TreeView Name="ResultTreeViewFull" BorderThickness="0">
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type local:ObjectNode}" ItemsSource="{Binding Path=Children}">
+                            <TreeViewItem>
+                                <TreeViewItem.Header>
+                                    <StackPanel Orientation="Horizontal" Margin="-10,0,0,0">
+                                        <TextBlock Text="{Binding Path=Name}"/>
+                                        <TextBlock Text=" : "/>
+                                        <TextBlock Text="{Binding Path=Value}"/>
+
+                                    </StackPanel>
+                                </TreeViewItem.Header>
+                            </TreeViewItem>
+                        </HierarchicalDataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
+            </TabItem> <!-- only for testing purposes of the complete response -->
+
+        </TabControl>
+
+        <Grid Name="RequestProgressBar" Grid.Row="1" Grid.Column="1" Margin="146,93,146,25" Width="300" Height="35" Visibility="Collapsed">
+            <ProgressBar IsIndeterminate="True" />
+            <TextBlock Name="RequestProgressBarText" HorizontalAlignment="Center" VerticalAlignment="Center">Processing...</TextBlock>
+        </Grid>
+
+    </Grid>
+
+</Window>
